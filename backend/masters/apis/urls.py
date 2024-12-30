@@ -1,24 +1,26 @@
-from django.conf.urls import url
 from django.urls import path
 from masters.apis.views import (
-    # CategoryDetail,
     CategoryDetailView,
-    CategoryList,  # , CategoryViewSet
+    CategoryList,
+    # CategoryViewSet,  # Uncomment if you want to use CategoryViewSet
 )
 
+# If you want to use CategoryViewSet with Django Rest Framework's ViewSet:
 # category_details = CategoryViewSet.as_view({'get': 'list'})
 # category_detail = CategoryViewSet.as_view({'get': 'retrieve'})
 
 urlpatterns = [
+    # Path for listing categories
     path('category/', CategoryList.as_view({'get': 'list'}), name='category'),
+
+    # Path for retrieving a specific category by ID
     path('category/<id>', CategoryDetailView.as_view(), name='category_detail'),
 
-    # path('category/', CategoryList.as_view({'get': 'list'})),
-    # path('category/', CategoryList.as_view()), # Working
-    # path('category/<str:name>/', CategoryDetail.as_view()),  # Working
-    # url(r'category/$', CategoryList.as_view(), name='category'),
-    # path('category/',
-    #      CategoryViewSet.as_view({'get': 'list'}), name='category-list'),
-    # path('category/<int:id>/',
-    #      CategoryViewSet.as_view({'get': 'retrieve'}), name='category-detail'),
+    # Alternative paths you had commented out
+    # path('category/', CategoryList.as_view()),  # Uncomment this if you want to use this route for CategoryList without specifying HTTP methods
+    # path('category/<str:name>/', CategoryDetail.as_view()),  # Uncomment this if you want to use a category with name instead of id
+
+    # Using ViewSet approach (if CategoryViewSet is defined)
+    # path('category/', category_details, name='category-list'),  # Use ViewSet for list view
+    # path('category/<int:id>/', category_detail, name='category-detail'),  # Use ViewSet for individual category detail
 ]

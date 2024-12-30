@@ -20,7 +20,7 @@ const NotFoundPage = () => {
   }, [router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
       <div className="text-center max-w-lg bg-white p-8 rounded-lg shadow-md border border-gray-200">
         <h1 className="text-6xl font-bold text-red-500 mb-4">404</h1>
         <p className="text-xl text-gray-700 mb-6">

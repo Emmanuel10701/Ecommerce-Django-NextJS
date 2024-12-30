@@ -8,6 +8,7 @@ import { callLoginAPI } from 'services/auth.service';
 import { saveToken } from 'store/modules/auth';
 import { removeToken, setToken } from 'Utils/token';
 import { FcGoogle } from "react-icons/fc"; // Import React icons
+import axios from "axios"; // Make sure axios is imported
 
 const Login = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  // Handle regular login submission
   const onSubmit = async (input) => {
     const { status, data } = await callLoginAPI(input);
     if (status === 401 || status === 400) {
@@ -25,6 +27,33 @@ const Login = () => {
       dispatch(saveToken(data.access));
       addToast("Login Success!", { appearance: 'success', autoDismiss: true });
       router.push('/');
+    }
+  };
+
+  // Handle Google login
+  const callGoogleLoginAPI = async (token) => {
+    try {
+      const response = await axios.post(' http://127.0.0.1:8000/auth/google', { token });
+      return response.data; // Handle the response as needed
+    } catch (error) {
+      return { status: error.response.status, data: error.response.data };
+    }
+  };
+
+  // Handle Google sign-in button click
+  const handleGoogleLogin = async () => {
+    const googleToken = await getGoogleToken(); // Replace with actual method
+
+    if (googleToken) {
+      const { status, data } = await callGoogleLoginAPI(googleToken);
+      if (status === 200) {
+        setToken(data.access);
+        dispatch(saveToken(data.access));
+        addToast("Google Login Success!", { appearance: 'success', autoDismiss: true });
+        router.push('/');
+      } else {
+        addToast(data.detail, { appearance: 'error', autoDismiss: true });
+      }
     }
   };
 
@@ -43,6 +72,7 @@ const Login = () => {
                 noValidate
                 className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7"
               >
+                {/* Username field */}
                 <div className="relative pb-3">
                   <label
                     htmlFor="username"
@@ -58,6 +88,8 @@ const Login = () => {
                   />
                   {errors.username && <small className="text-red-500">{errors.username.message}</small>}
                 </div>
+
+                {/* Password field */}
                 <div className="relative">
                   <label
                     htmlFor="password"
@@ -74,6 +106,8 @@ const Login = () => {
                   />
                   {errors.password && <small className="text-red-500">{errors.password.message}</small>}
                 </div>
+
+                {/* Submit button */}
                 <div className="relative">
                   <button
                     type="submit"
@@ -88,23 +122,27 @@ const Login = () => {
                     Are you already registered?
                   </Link>
                 </div>
-                <button
-                  className="flex items-center justify-center w-full py-3 bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition"
-                >
-                  <FcGoogle className="text-2xl mr-3" />
-                  <span className="text-gray-700 font-medium">Sign in with Google</span>
-                </button>
-                <p className="text-center text-sm text-gray-500 mt-6">
-                  By signing in, you agree to our{" "}
-                  <a href="#" className="text-blue-500 hover:underline">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#" className="text-blue-500 hover:underline">
-                    Privacy Policy
-                  </a>.
-                </p>
               </form>
+
+              {/* Google login button */}
+              <button
+                onClick={handleGoogleLogin}
+                className="flex items-center justify-center w-full py-3 bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition"
+              >
+                <FcGoogle className="text-2xl mr-3" />
+                <span className="text-gray-700 font-medium">Sign in with Google</span>
+              </button>
+
+              <p className="text-center text-sm text-gray-500 mt-6">
+                By signing in, you agree to our{" "}
+                <a href="#" className="text-blue-500 hover:underline">
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="#" className="text-blue-500 hover:underline">
+                  Privacy Policy
+                </a>.
+              </p>
             </div>
           </div>
         </div>

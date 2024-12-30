@@ -1,9 +1,12 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -32,7 +35,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'mptt',
-
+    'social_django',  # Add this line for social auth
 
     # My Apps.
     'masters',
@@ -71,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -81,7 +83,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -101,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -115,24 +115,21 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Site configuration
 SITE_ID = 1
 
+# REST Framework Authentication
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -140,16 +137,46 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
 }
 
+# DJOSER configuration
 DJOSER = {
-    # 'LOGIN_FIELD': 'email',
     "USER_CREATE_PASSWORD_RETYPE": True,
-    # 'REQUIRED_FIELDS'  : ['username']
 }
+
+# CORS settings
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
+    "http://localhost:3000",  # Replace with your frontend URL
 ]
+
+# Social Authentication Settings (Google OAuth2)
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',  # Google OAuth2 backend
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_LOGOUT_REDIRECT_URL = '/'
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://localhost:8000/complete/google/"
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+# Add your database configurations here
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
