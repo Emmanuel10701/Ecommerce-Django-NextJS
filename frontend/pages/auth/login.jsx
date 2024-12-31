@@ -10,6 +10,9 @@ import { removeToken, setToken } from 'Utils/token';
 import { FcGoogle } from "react-icons/fc"; // Import React icons
 import axios from "axios"; // Make sure axios is imported
 
+
+
+
 const Login = () => {
   const router = useRouter();
   const { addToast } = useToasts();
@@ -30,33 +33,26 @@ const Login = () => {
     }
   };
 
-  // Handle Google login
-  const callGoogleLoginAPI = async (token) => {
-    try {
-      const response = await axios.post(' http://127.0.0.1:8000/auth/google', { token });
-      return response.data; // Handle the response as needed
-    } catch (error) {
-      return { status: error.response.status, data: error.response.data };
-    }
-  };
-
-  // Handle Google sign-in button click
   const handleGoogleLogin = async () => {
-    const googleToken = await getGoogleToken(); // Replace with actual method
-
-    if (googleToken) {
-      const { status, data } = await callGoogleLoginAPI(googleToken);
-      if (status === 200) {
-        setToken(data.access);
-        dispatch(saveToken(data.access));
-        addToast("Google Login Success!", { appearance: 'success', autoDismiss: true });
-        router.push('/');
-      } else {
-        addToast(data.detail, { appearance: 'error', autoDismiss: true });
-      }
+    try {
+      // Send a request to the backend to initiate the Google login process
+      const { data } = await axios.get('http://127.0.0.1:8000/social/login/google/');
+      
+      // Extract the URL returned by the backend for Google login
+      const googleLoginUrl = data.url;
+  
+      // Check if a `next` URL is present, otherwise use the default
+      const nextUrl = encodeURIComponent("http://localhost:3000/auth/login");
+  
+      // Redirect the user to Google's OAuth consent page with the `next` parameter
+      window.location.href = `${googleLoginUrl}?next=${nextUrl}`;
+    } catch (error) {
+      addToast("Google Login Failed!", { appearance: 'error', autoDismiss: true });
     }
   };
-
+  
+  
+  
   return (
     <div className="min-h-screen py-2 flex flex-col justify-center sm:py-10">
       <div className="relative py-3 sm:max-w-xl w-2/6 md:mx-auto sm:mx-auto">
@@ -125,11 +121,13 @@ const Login = () => {
               </form>
 
               {/* Google login button */}
+
               <button
-                onClick={handleGoogleLogin}
+               onClick={handleGoogleLogin}
                 className="flex items-center justify-center w-full py-3 bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition"
               >
                 <FcGoogle className="text-2xl mr-3" />
+
                 <span className="text-gray-700 font-medium">Sign in with Google</span>
               </button>
 

@@ -1,11 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from .views import GoogleAuthView
 from django.conf.urls.static import static
 
 urlpatterns = [
     # Django Admin URL
     path('admin/', admin.site.urls),
+
+    path('social/login/google/', GoogleAuthView.as_view(), name='google-login'),
+    path('social/complete/google/', GoogleAuthView.as_view(), name='google-complete'),
+
 
     # Authentication Routes
     path('auth/google', include('social_django.urls')),  # Handles social auth routes like login and callback

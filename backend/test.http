@@ -1,0 +1,12 @@
+### Step 1: Get Google OAuth2 URL (Initiate OAuth)
+GET http://localhost:8000/google-login/
+
+###
+
+### Step 2: Use the code from the response (replace `<code>` with actual code)
+POST http://localhost:8000/complete/google/
+Content-Type: application/json
+
+{
+  "code": "<code>"
+}

@@ -156,7 +156,7 @@ CORS_ORIGIN_WHITELIST = [
 # Social Authentication Settings (Google OAuth2)
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',  # Google OAuth2 backend
-    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
